@@ -1,0 +1,49 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+.venv/
+env/
+venv/
+ENV/
+
+# VS Code settings
+.vscode/
+
+# Environment variables and secrets
+.env
+.env.*
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Python-specific
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Database files (if using SQLite locally)
+*.sqlite3
+
+# Pytest / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Mypy / Pyright
+.mypy_cache/
+.pyright/
+
+# Logs
+*.log
+
+# Uvicorn / Gunicorn logs
+gunicorn.log
+uvicorn.log
+
+# __pypackages__ for PEP 582
+__pypackages__/
+__pycache__/
