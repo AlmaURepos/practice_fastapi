@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from pydantic import BaseModel
 from database import User, get_session, create_tables
+from .utils import get_pass_hash, verify_pass
 
 class UserCreate(BaseModel):
     username: str
@@ -39,7 +40,8 @@ async def register_user(user: UserCreate, session: AsyncSession= Depends(get_ses
     if existing_user:
         raise HTTPException(status_code=400, detail=f"User {user.username} is already existing!")
     
-    db_user = User(username= user.username, password=user.password)
+    hashed_pass = get_pass_hash(user.password)
+    db_user = User(username= user.username, password=hashed_pass)
     session.add(db_user)
     await session.commit()
     await session.refresh(db_user)
@@ -54,7 +56,7 @@ async def login_user(user: UserLogin, session: AsyncSession= Depends(get_session
     if not db_user:
         raise HTTPException(status_code=401, detail="Unauthorized")
     
-    if db_user.password != user.password:
+    if not verify_pass(user.password, db_user.password):
         raise HTTPException(status_code=401, detail="Invalid access data")
     
     return {"msg": "Success", "username": db_user.username}
