@@ -4,6 +4,7 @@ from sqlalchemy import select
 from pydantic import BaseModel
 from database import User, get_session, create_tables
 from .utils import get_pass_hash, verify_pass
+from .auth import create_access_token
 
 class UserCreate(BaseModel):
     username: str
@@ -16,6 +17,10 @@ class UserLogin(BaseModel):
 class UserResponse(BaseModel):
     id: int
     username: str
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
 
 
 
@@ -59,7 +64,10 @@ async def login_user(user: UserLogin, session: AsyncSession= Depends(get_session
     if not verify_pass(user.password, db_user.password):
         raise HTTPException(status_code=401, detail="Invalid access data")
     
-    return {"msg": "Success", "username": db_user.username}
+    access_token = create_access_token(data={"sub": db_user.username})
+    
+    # return {"msg": "Success", "username": db_user.username}
+    return Token(access_token=access_token, token_type="bearer")
 
 
 

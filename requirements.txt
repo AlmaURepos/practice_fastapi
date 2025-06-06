@@ -1,7 +1,8 @@
 fastapi
 uvicorn
 sqlalchemy
-psycopg2[binary]
 pydantic
 asyncpg
 passlib[bcrypt]
+psycopg2[binary]
+python-jose[cryptography]
