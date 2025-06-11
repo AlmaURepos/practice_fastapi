@@ -21,6 +21,7 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String, unique=True, nullable=False, index=True)
     password = Column(String, nullable=False)
+    role = Column(String, default='user', nullable=False)
 
 
 async def get_session() -> AsyncSession:
