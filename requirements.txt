@@ -6,3 +6,5 @@ asyncpg
 passlib[bcrypt]
 psycopg2[binary]
 python-jose[cryptography]
+pytest
+pytest-asyncio
