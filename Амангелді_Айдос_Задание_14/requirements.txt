@@ -1,13 +1,15 @@
 uvicorn[standard]
 passlib[bcrypt]
-psycopg2[binary]
 python-jose[cryptography]
 fastapi
 sqlalchemy
 pydantic
 pydantic-settings
+psycopg2-binary
 asyncpg
 pytest
 pytest-asyncio
 aioredis
 redis
+celery
+

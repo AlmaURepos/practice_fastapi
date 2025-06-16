@@ -19,7 +19,6 @@
     ```bash
     pip install -r requirements.txt
 
-
 4. Создайте базы данных PostgreSQL:
 
     ```bash
@@ -39,15 +38,9 @@
     ```bash
     docker-compose up --build
 
-
 ### Опционально: запуск тестов
 
 7. Вы можете проверить работу приложения с помощью pytest:
 
     ```bash
     pytest -v folder_name/tests/tests.py
-
-
-
-
-
