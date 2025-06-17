@@ -6,5 +6,6 @@ class Settings(BaseSettings):
     redis_url: str
 
     model_config = SettingsConfigDict(extra="allow")
+    
 
 settings = Settings()
