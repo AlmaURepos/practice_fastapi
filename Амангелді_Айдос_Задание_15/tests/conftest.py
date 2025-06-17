@@ -1,11 +1,10 @@
-# Амангелді_Айдос_Задание_15/tests/conftest.py
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import pytest
 import pytest_asyncio
-from httpx import AsyncClient
+from httpx import AsyncClient, ASGITransport 
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -13,7 +12,6 @@ from app import app
 from database import Base, get_session
 
 TEST_DB_URL = os.environ.get("DATABASE_URL")
-
 
 test_engine = create_async_engine(TEST_DB_URL, echo=True, future=True)
 test_async_session = sessionmaker(test_engine, class_=AsyncSession, expire_on_commit=False)
@@ -37,5 +35,6 @@ async def setup_db():
 
 @pytest_asyncio.fixture
 async def client(setup_db):
-    async with AsyncClient(app=app, base_url="http://test") as ac:
+    transport = ASGITransport(app=app)  
+    async with AsyncClient(transport=transport, base_url="http://test") as ac:
         yield ac
