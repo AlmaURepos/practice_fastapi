@@ -42,9 +42,9 @@ jobs:
       - name: Run tests
         working-directory: Амангелді_Айдос_Задание_15
         env:
-          DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/test_notes_db
-          REDIS_URL: redis://localhost:6379/0
-          TEST_DB_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/test_notes_db
+          DATABASE_URL: postgresql+asyncpg://postgres:postgres@db:5432/practice_notes_db
+          REDIS_URL: redis://redis:6379/0
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
         run: pytest tests
 
       - name: Build Docker image
