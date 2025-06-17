@@ -39,6 +39,12 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Wait for PostgreSQL
+        run: |
+          until pg_isready -h postgres -p 5432 -U postgres; do
+            echo "Waiting for PostgreSQL..."
+            sleep 2
+          done
       - name: Run tests
         working-directory: Амангелді_Айдос_Задание_15
         env:
