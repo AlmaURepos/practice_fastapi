@@ -42,8 +42,8 @@ jobs:
       - name: Run tests
         working-directory: Амангелді_Айдос_Задание_15
         env:
-          DATABASE_URL: postgresql+asyncpg://postgres:postgres@db:5432/practice_notes_db
-          REDIS_URL: redis://redis:6379/0
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          REDIS_URL: ${{ secrets.REDIS_URL }}
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
         run: pytest tests
 
