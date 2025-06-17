@@ -20,6 +20,8 @@ import json
 
 app = FastAPI(title="Notes + Auth API")
 router = APIRouter()
+
+# redis_client = redis.from_url(settings.redis_url, decode_responses=True)
 def get_redis_client():
     return redis.from_url(settings.redis_url, decode_responses=True)
 
@@ -172,8 +174,11 @@ async def get_notes(
     notes = res.scalars().all()
 
     # serialized_notes = [note.dict() for note in notes]
+    
+    # await redis_client.setex(cache_key, 600, json.dumps(serialized_notes))
+    
     serialized_notes = [NoteOut.from_orm(note).dict() for note in notes]
-    await redis_client.setex(cache_key, 600, json.dumps(serialized_notes))
+    await redis_client.setex(cache_key, 600, json.dumps(serialized_notes, default=str))
     return notes
 
 @app.get("/notes/{note_id}", response_model=NoteOut)
