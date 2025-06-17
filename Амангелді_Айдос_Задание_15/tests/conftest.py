@@ -25,7 +25,7 @@ async def override_get_session():
 
 app.dependency_overrides[get_session] = override_get_session
 
-@pytest_asyncio.fixture(scope='session')
+@pytest_asyncio.fixture(scope='function')
 async def setup_db():
     async with test_engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
@@ -33,8 +33,9 @@ async def setup_db():
     async with test_engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
 
-@pytest_asyncio.fixture
-async def client(setup_db):
-    transport = ASGITransport(app=app)  
+@pytest_asyncio.fixture(scope="function")
+async def client(setup_db): 
+    transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
         yield ac
+
