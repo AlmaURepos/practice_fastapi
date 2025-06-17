@@ -12,7 +12,7 @@ from sqlalchemy.orm import sessionmaker
 from app import app
 from database import Base, get_session
 
-TEST_DB_URL = os.environ.get("TEST_DB_URL", "postgresql+asyncpg://postgres:postgres@localhost:5432/test_notes_db")
+TEST_DB_URL = os.environ.get("DATABASE_URL", "postgresql+asyncpg://postgres:postgres@db:5432/practice_notes_db")
 
 test_engine = create_async_engine(TEST_DB_URL, echo=True, future=True)
 test_async_session = sessionmaker(test_engine, class_=AsyncSession, expire_on_commit=False)
