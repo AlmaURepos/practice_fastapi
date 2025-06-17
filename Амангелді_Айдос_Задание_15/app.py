@@ -171,7 +171,8 @@ async def get_notes(
     res = await session.execute(query)
     notes = res.scalars().all()
 
-    serialized_notes = [note.dict() for note in notes]
+    # serialized_notes = [note.dict() for note in notes]
+    serialized_notes = [NoteOut.from_orm(note).dict() for note in notes]
     await redis_client.setex(cache_key, 600, json.dumps(serialized_notes))
     return notes
 
