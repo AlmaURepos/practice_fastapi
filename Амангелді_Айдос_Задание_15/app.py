@@ -142,7 +142,10 @@ async def create_note(
     session.add(db_note)
     await session.commit()
     await session.refresh(db_note)
-    await redis_client.delete([key async for key in redis_client.scan_iter(f"notes:{current_user.id}:*")])
+    keys = [key async for key in redis_client.scan_iter(f"notes:{current_user.id}:*")]
+    if keys:
+        await redis_client.delete(*keys)
+
     return db_note
 
 @app.get("/notes", response_model=List[NoteOut])
