@@ -227,7 +227,11 @@ async def delete_note(
         raise HTTPException(status_code=404, detail="Note not found or access denied")
     await session.delete(note)
     await session.commit()
-    await redis_client.delete([key async for key in redis_client.scan_iter(f"notes:{current_user.id}:*")])
+    # await redis_client.delete([key async for key in redis_client.scan_iter(f"notes:{current_user.id}:*")])
+    keys = [key async for key in redis_client.scan_iter(f"notes:{current_user.id}:*")]
+    if keys:
+        await redis_client.delete(*keys)
+
     return {"message": "Note deleted"}
 
 # --- CELERY ENDPOINT ---
