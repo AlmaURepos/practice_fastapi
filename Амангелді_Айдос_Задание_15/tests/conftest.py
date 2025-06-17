@@ -1,6 +1,7 @@
+# Амангелді_Айдос_Задание_15/tests/conftest.py
 import sys
 import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import pytest
 import pytest_asyncio
@@ -8,10 +9,10 @@ from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
-from Амангелді_Айдос_Задание_9.app import app
+from app import app
 from database import Base, get_session
 
-TEST_DB_URL = "postgresql+asyncpg://postgres:postgres@localhost/test_notes_db"
+TEST_DB_URL = os.environ.get("TEST_DB_URL", "postgresql+asyncpg://postgres:postgres@localhost:5432/test_notes_db")
 
 test_engine = create_async_engine(TEST_DB_URL, echo=True, future=True)
 test_async_session = sessionmaker(test_engine, class_=AsyncSession, expire_on_commit=False)

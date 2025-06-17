@@ -1,5 +1,6 @@
 from datetime import datetime
 from typing import List, Optional
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Depends, HTTPException, status, Query, APIRouter, WebSocket, WebSocketDisconnect
 from fastapi.security import OAuth2PasswordBearer
@@ -9,11 +10,11 @@ from sqlalchemy import select
 from pydantic_settings import BaseSettings
 
 from database import Note, User, get_session, create_tables
-from depends import get_current_user, require_role
-from utils import get_pass_hash, verify_pass
-from auth import create_access_token
-from celery_config import app as celery_app
-from config import settings
+from .depends import get_current_user, require_role
+from .utils import get_pass_hash, verify_pass
+from .auth import create_access_token
+from .celery_config import app as celery_app
+from .config import settings
 import redis.asyncio as redis
 import json
 
@@ -74,9 +75,12 @@ manager = ConnectionManager()
 
 # --- STARTUP ---
 
-@app.on_event('startup')
-async def startup():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
     await create_tables()
+    yield
+
+app.lifespan = lifespan
 
 # --- COMMON ---
 
