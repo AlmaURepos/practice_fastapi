@@ -9,6 +9,7 @@ from auth import SECRET_KEY, ALGORITHM
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 
+
 async def get_current_user(
     token: str = Depends(oauth2_scheme), 
     session: AsyncSession = Depends(get_session)

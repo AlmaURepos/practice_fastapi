@@ -20,7 +20,9 @@ import json
 
 app = FastAPI(title="Notes + Auth API")
 router = APIRouter()
-redis_client = redis.from_url(settings.redis_url, decode_responses=True)
+def get_redis_client():
+    return redis.from_url(settings.redis_url, decode_responses=True)
+
 
 # --- MODELS ---
 
@@ -138,6 +140,7 @@ async def create_note(
     current_user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session)
 ):
+    redis_client = get_redis_client()
     db_note = Note(text=note.text, owner_id=current_user.id)
     session.add(db_note)
     await session.commit()
@@ -156,6 +159,7 @@ async def get_notes(
     current_user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session)
 ):
+    redis_client = get_redis_client()
     cache_key = f"notes:{current_user.id}:{skip}:{limit}:{search or ''}"
     cached_data = await redis_client.get(cache_key)
     if cached_data:
@@ -191,6 +195,7 @@ async def update_note(
     current_user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session)
 ):
+    redis_client = get_redis_client()
     query = select(Note).where(Note.id == note_id, Note.owner_id == current_user.id)
     res = await session.execute(query)
     note = res.scalar_one_or_none()
@@ -208,6 +213,7 @@ async def delete_note(
     current_user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session)
 ):
+    redis_client = get_redis_client()
     query = select(Note).where(Note.id == note_id, Note.owner_id == current_user.id)
     res = await session.execute(query)
     note = res.scalar_one_or_none()
