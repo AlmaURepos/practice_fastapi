@@ -5,12 +5,15 @@ from httpx import AsyncClient
 from httpx._transports.asgi import ASGITransport
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from app import app
+from app import create_app
 from database import Base, get_session
 
 TEST_DB_URL = os.getenv("DATABASE_URL")
+
+@pytest_asyncio.fixture(scope="session")
+def app():
+    # Создаём приложение без лимитера
+    return create_app(with_rate_limiter=False)
 
 @pytest_asyncio.fixture(scope="function")
 async def engine_and_session():
@@ -28,7 +31,7 @@ async def engine_and_session():
     await test_engine.dispose()
 
 @pytest_asyncio.fixture(scope="function")
-async def client(engine_and_session):
+async def client(app, engine_and_session):
     engine, session_maker = engine_and_session
 
     async def override_get_session():
