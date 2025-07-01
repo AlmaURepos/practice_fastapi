@@ -1,9 +1,13 @@
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker, relationship, declarative_base
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Boolean
 from datetime import datetime
+from dotenv import load_dotenv
+import os
 
-DATABASE_URL = "postgresql+asyncpg://postgres:postgres@localhost/notes_db"
+# DATABASE_URL = "postgresql+asyncpg://postgres:postgres@localhost/notes_db"
+load_dotenv()
+DATABASE_URL = os.getenv("DATABASE_URL")
 
 engine = create_async_engine(DATABASE_URL, echo=True, future=True)
 async_session = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
@@ -16,6 +20,7 @@ class Note(Base):
     text = Column(String, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
     owner_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    is_completed = Column(Boolean, default=False, nullable=False)
 
     owner = relationship("User", back_populates="notes")
 

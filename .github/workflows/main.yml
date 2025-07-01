@@ -35,7 +35,6 @@ jobs:
           python-version: '3.10'
 
       - name: Install dependencies
-        working-directory: Амангелді_Айдос_Задание_15
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
@@ -71,7 +70,6 @@ jobs:
           done
 
       - name: Run tests
-        working-directory: Амангелді_Айдос_Задание_15
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           REDIS_URL: ${{ secrets.REDIS_URL }}
@@ -79,7 +77,6 @@ jobs:
         run: pytest tests
 
       - name: Build Docker image
-        working-directory: Амангелді_Айдос_Задание_15
         run: docker build -t my-notes-app:latest -f dockerfile .
 
       - name: Log in to Docker Hub
@@ -92,3 +89,26 @@ jobs:
         run: |
           docker tag my-notes-app:latest ${{ secrets.DOCKER_USERNAME }}/my-notes-app:latest
           docker push ${{ secrets.DOCKER_USERNAME }}/my-notes-app:latest
+
+  deploy:
+    needs: build_and_test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Pull and push Docker image
+        run: |
+          docker pull ${{ secrets.DOCKER_USERNAME }}/my-notes-app:latest
+      - name: Deploy to Heroku
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+        run: |
+          echo "$HEROKU_API_KEY" | docker login --username=_ --password-stdin registry.heroku.com
+          docker tag ${{ secrets.DOCKER_USERNAME }}/my-notes-app:latest registry.heroku.com/${{ secrets.HEROKU_APP_NAME }}/web
+          docker push registry.heroku.com/${{ secrets.HEROKU_APP_NAME }}/web
+          heroku container:release web --app ${{ secrets.HEROKU_APP_NAME }}
