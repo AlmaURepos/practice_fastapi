@@ -31,7 +31,7 @@ import os
 # --- MODELS ---
 
 class ErrorResponse(BaseModel):
-    detail: str = Field(..., description="Error message", example="User already exists")
+    detail: str = Field(..., description="Error message 123", example="User already exists")
 
 class UserCreate(BaseModel):
     username: str = Field(..., description="Unique username", example="johndoe")
