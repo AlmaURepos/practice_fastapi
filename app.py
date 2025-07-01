@@ -397,26 +397,24 @@ class RateLimiterMiddleware(BaseHTTPMiddleware):
         self.redis_url = redis_url
         self.limit = limit
         self.window = window
-        self._redis = None
 
     async def get_redis(self):
-        if self._redis is None:
-            self._redis = await redis.from_url(self.redis_url, decode_responses=True)
-        return self._redis
+        return redis.from_url(self.redis_url, decode_responses=True)
 
     async def dispatch(self, request: Request, call_next):
-        client_ip = request.client.host
-        key = f"ratelimit:{client_ip}"
+        # Создаём redis-клиента внутри запроса
         redis_client = await self.get_redis()
-        count = await redis_client.incr(key)
-        if count == 1:
-            await redis_client.expire(key, self.window)
-        if count > self.limit:
-            return Response(
-                content="Too Many Requests",
-                status_code=429
-            )
-        return await call_next(request)
+        try:
+            key = f"rate_limit:{request.client.host}"
+            count = await redis_client.incr(key)
+            if count == 1:
+                await redis_client.expire(key, self.window)
+            if count > self.limit:
+                return Response("Too Many Requests", status_code=429)
+            response = await call_next(request)
+            return response
+        finally:
+            await redis_client.close()
 
 class LoggingMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
